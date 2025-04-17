@@ -1,6 +1,6 @@
 # Sonoff 2-Button Light Switch with Sunrise/Sunset
 
-This ESPHome configuration enables a Sonoff 2-button (e.g., T2 2-gang) touch switch to control Garage and Carport Lights, with the Carport Light automatically toggling at sunrise and sunset. It integrates with Home Assistant for local control and monitoring.
+This ESPHome configuration enables a Sonoff 2-button (e.g., T0 2-gang) touch switch to control Garage and Carport Lights, with the Carport Light automatically toggling at sunrise and sunset. It integrates with Home Assistant for local control and monitoring.
 
 ## Features
 
@@ -13,7 +13,7 @@ This ESPHome configuration enables a Sonoff 2-button (e.g., T2 2-gang) touch swi
 
 ## Prerequisites
 
-- Sonoff 2-button touch switch (e.g., T2 2-gang, ESP8266-based)
+- Sonoff 2-button touch switch (e.g., T0 2-gang, ESP8266-based)
 - ESPHome (installed and configured with Home Assistant)
 - Home Assistant for integration
 - Latitude and longitude of your location (e.g., Benoni, Gauteng: -26.1885, 28.3208)
