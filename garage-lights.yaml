@@ -1,7 +1,7 @@
 esphome:
   name: garage-lights
   friendly_name: Garage Light Switch
-  comment: Sonoff two button light switch with sunrise/sunset automation
+  comment: Sonoff two button light switch
   on_boot:
     then:
       light.turn_on: garage_lights
@@ -23,27 +23,16 @@ api:
 
 ota:
   - platform: esphome
-    password: "3dad87c4b30e5239012b8e37ce1dc1c7"
+    password: !secret ota_password
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  power_save_mode: none
   ap:
     ssid: "Garage-Lights Fallback Hotspot"
     password: !secret fallback_password
 
 captive_portal:
-
-sun:
-  latitude: !secret home_latitude
-  longitude: !secret home_longitude
-  on_sunrise:
-    - then:
-        - light.turn_off: carport_light
-  on_sunset:
-    - then:
-        - light.turn_on: carport_light
 
 binary_sensor:
   - platform: gpio
@@ -54,7 +43,6 @@ binary_sensor:
         pullup: true
       inverted: true
     id: button_1
-    name: "Button 1"
     on_press:
       then:
         - light.toggle: garage_lights
@@ -66,7 +54,6 @@ binary_sensor:
         pullup: true
       inverted: true
     id: button_2
-    name: "Button 2"
     on_press:
       then:
         - light.toggle: carport_light
@@ -88,10 +75,6 @@ light:
     name: "Garage Lights"
     output: relay1
     id: garage_lights
-    on_turn_on:
-      - output.turn_on: blue_led
-    on_turn_off:
-      - output.turn_off: blue_led
   - platform: binary
     name: "Carport Lights"
     output: relay2
@@ -111,15 +94,29 @@ sensor:
       - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
     unit_of_measurement: "%"
     entity_category: "diagnostic"
-  - platform: uptime
-    name: "Uptime"
-    update_interval: 60s
-    entity_category: "diagnostic"
+  - platform: homeassistant
+    id: sun_state
+    entity_id: sun.sun
+    internal: true
 
 text_sensor:
-  - platform: sun
-    name: "Next Sunrise"
-    type: sunrise
-  - platform: sun
-    name: "Next Sunset"
-    type: sunset
+  - platform: homeassistant
+    id: sun_text_state
+    entity_id: sun.sun
+    internal: true
+
+script:
+  - id: check_sun
+    then:
+      - if:
+          condition:
+            lambda: 'return id(sun_text_state).state == "below_horizon";'
+          then:
+            - light.turn_on: carport_light
+          else:
+            - light.turn_off: carport_light
+
+interval:
+  - interval: 60s
+    then:
+      - script.execute: check_sun
